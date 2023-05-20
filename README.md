@@ -30,6 +30,8 @@ Flags:
         Regular expression to match structures, can receive multiple flags
   -e value
         Regular expression to exclude structures, can receive multiple flags
+  -optypes value
+        Regular expression to exclude optional field types, can receive multiple flags
 ```
 
 ### Example
