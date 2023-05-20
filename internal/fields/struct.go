@@ -4,6 +4,8 @@ import (
 	"go/ast"
 	"go/types"
 	"reflect"
+
+	"github.com/GaijinEntertainment/go-exhaustruct/v3/internal/pattern"
 )
 
 const (
@@ -21,16 +23,17 @@ type StructFields []*StructField
 
 // NewStructFields creates a new [StructFields] from a given struct type.
 // StructFields items are listed in order they appear in the struct.
-func NewStructFields(strct *types.Struct) StructFields {
+func NewStructFields(strct *types.Struct, optTypes pattern.List) StructFields {
 	sf := make(StructFields, 0, strct.NumFields())
 
 	for i := 0; i < strct.NumFields(); i++ {
 		f := strct.Field(i)
 
+		optional := HasOptionalTag(strct.Tag(i)) || optTypes.MatchFullString(f.Type().String())
 		sf = append(sf, &StructField{
 			Name:     f.Name(),
 			Exported: f.Exported(),
-			Optional: HasOptionalTag(strct.Tag(i)),
+			Optional: optional,
 		})
 	}
 

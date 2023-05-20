@@ -10,6 +10,7 @@ import (
 	"golang.org/x/tools/go/packages"
 
 	"github.com/GaijinEntertainment/go-exhaustruct/v3/internal/fields"
+	"github.com/GaijinEntertainment/go-exhaustruct/v3/internal/pattern"
 )
 
 func Test_HasOptionalTag(t *testing.T) {
@@ -56,13 +57,16 @@ func (s *StructFieldsSuite) getReferenceStructFields() fields.StructFields {
 	typ := s.pkg.TypesInfo.TypeOf(obj.Decl.(*ast.TypeSpec).Type) //nolint:forcetypeassert
 	s.Require().NotNil(typ)
 
-	return fields.NewStructFields(typ.Underlying().(*types.Struct)) //nolint:forcetypeassert
+	list, err := pattern.NewList(".*testdata.OptionalType")
+	s.Require().NoError(err)
+
+	return fields.NewStructFields(typ.Underlying().(*types.Struct), list) //nolint:forcetypeassert
 }
 
 func (s *StructFieldsSuite) TestNewStructFields() {
 	sf := s.getReferenceStructFields()
 
-	s.Assert().Len(sf, 4)
+	s.Assert().Len(sf, 6)
 	s.Assert().Equal(fields.StructFields{
 		{
 			Name:     "ExportedRequired",
@@ -84,6 +88,16 @@ func (s *StructFieldsSuite) TestNewStructFields() {
 			Exported: false,
 			Optional: true,
 		},
+		{
+			Name:     "ExportedOptionalType",
+			Exported: true,
+			Optional: true,
+		},
+		{
+			Name:     "unexportedOptionalType",
+			Exported: false,
+			Optional: true,
+		},
 	}, sf)
 }
 
@@ -91,7 +105,7 @@ func (s *StructFieldsSuite) TestStructFields_String() {
 	sf := s.getReferenceStructFields()
 
 	s.Assert().Equal(
-		"ExportedRequired, unexportedRequired, ExportedOptional, unexportedOptional",
+		"ExportedRequired, unexportedRequired, ExportedOptional, unexportedOptional, ExportedOptionalType, unexportedOptionalType",
 		sf.String(),
 	)
 }
@@ -116,6 +130,8 @@ func (s *StructFieldsSuite) TestStructFields_SkippedFields_Unnamed() {
 				{"unexportedRequired", false, false},
 				{"ExportedOptional", true, true},
 				{"unexportedOptional", false, true},
+				{"ExportedOptionalType", true, true},
+				{"unexportedOptionalType", false, true},
 			}, sf.SkippedFields(lit, true))
 		}
 	}

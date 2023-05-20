@@ -13,6 +13,7 @@ func BenchmarkAnalyzer(b *testing.B) {
 	a, err := analyzer.NewAnalyzer(
 		[]string{`.*[Tt]est.*`, `.*External`, `.*Embedded`},
 		[]string{`.*Excluded$`},
+		[]string{".*testdata.OptionalType"},
 	)
 	require.NoError(b, err)
 

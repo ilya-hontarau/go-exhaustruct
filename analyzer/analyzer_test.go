@@ -16,25 +16,30 @@ var testdataPath, _ = filepath.Abs("./testdata/") //nolint:gochecknoglobals
 func TestAnalyzer(t *testing.T) {
 	t.Parallel()
 
-	a, err := analyzer.NewAnalyzer([]string{""}, nil)
+	a, err := analyzer.NewAnalyzer([]string{""}, nil, nil)
 	assert.Nil(t, a)
 	assert.Error(t, err)
 
-	a, err = analyzer.NewAnalyzer([]string{"["}, nil)
+	a, err = analyzer.NewAnalyzer([]string{"["}, nil, nil)
 	assert.Nil(t, a)
 	assert.Error(t, err)
 
-	a, err = analyzer.NewAnalyzer(nil, []string{""})
+	a, err = analyzer.NewAnalyzer(nil, []string{""}, nil)
 	assert.Nil(t, a)
 	assert.Error(t, err)
 
-	a, err = analyzer.NewAnalyzer(nil, []string{"["})
+	a, err = analyzer.NewAnalyzer(nil, []string{"["}, nil)
+	assert.Nil(t, a)
+	assert.Error(t, err)
+
+	a, err = analyzer.NewAnalyzer(nil, nil, []string{"["})
 	assert.Nil(t, a)
 	assert.Error(t, err)
 
 	a, err = analyzer.NewAnalyzer(
 		[]string{`.*[Tt]est.*`, `.*External`, `.*Embedded`},
 		[]string{`.*Excluded$`},
+		[]string{".*testdata.OptionalType"},
 	)
 	require.NoError(t, err)
 
